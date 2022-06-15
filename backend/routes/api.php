@@ -21,4 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/create', [StudentController::class, 'create']);
 Route::get('/fetch', [StudentController::class, 'fetch']);
-Route::get('/searching/name/{name}/department/{department}', [StudentController::class, 'searching']);
+Route::post('/searching', [StudentController::class, 'searching']);

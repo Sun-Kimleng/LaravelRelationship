@@ -43,24 +43,48 @@ class StudentController extends Controller
         return response()->json(['student'=>$student]);
     }
 
-    public function searching($name, $department){
+    public function searching(Request $request){
         
         $student = DB::table('students')
         ->join('departments', 'students.department_id', '=', 'departments.id')
         ->join('countries', 'students.country_id', '=', 'countries.id')
-        ->select('students.*', 'departments.name as depart_name', 'countries.name as count_name');
-        
-        
-        
-        if($name != '' & $department != ''){
-            $b = $student->where('students.name','LIKE', '%'.$name.'%')
+        ->select('students.id', 'students.name', 'departments.name as department'
+                , 'countries.name as country','students.created_at', 'students.updated_at');
+
+        $department= $request->input('department');
+        $name=$request->input('name');
+        $country=$request->input('country');
+    
+        if($request->filled('name') && $request->filled('department') && $request->filled('country')){
+            $data = $student->where('students.name','LIKE', '%'.$name.'%')
                     ->where('departments.name','=', $department)
+                    ->where('countries.name','=', $country)
                     ->get();
-        }else if($name != ''){
-            $data = $student->where('students.name','LIKE', '%'.$name.'%')->get();
         }
 
-            return response()->json(['data' => $b, 'name'=>$name, 'department'=>$department]);
+        if($request->filled('name')){
+            $data = $student->where('students.name','LIKE', '%'.$name.'%')->get();
+            
+        }
+
+        if($request->filled('department')){
+            $data = $student->where('departments.name','=', $department)->get();
+    
+        }
+
+        if($request->filled('country')){
+            $data = $student->where('countries.name','=', $country)->get();
+            
+        }
+        
+        if(!$request->filled('name') && !$request->filled('department') && !$request->filled('country')){
+            $data = $student->get();
+            
+        }
+
+
+      
+        return response()->json(['data' => $data, 'name'=>$name, 'department'=>$department]);
         
 
     }
