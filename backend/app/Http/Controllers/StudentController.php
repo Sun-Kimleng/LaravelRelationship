@@ -39,10 +39,29 @@ class StudentController extends Controller
 
         // $department= Department::find(1);
         // $student = $department->students;
-        foreach($student as $data){
-            $result = $data;
-        }
 
         return response()->json(['student'=>$student]);
+    }
+
+    public function searching($name, $department){
+        
+        $student = DB::table('students')
+        ->join('departments', 'students.department_id', '=', 'departments.id')
+        ->join('countries', 'students.country_id', '=', 'countries.id')
+        ->select('students.*', 'departments.name as depart_name', 'countries.name as count_name');
+        
+        
+        
+        if($name != '' & $department != ''){
+            $b = $student->where('students.name','LIKE', '%'.$name.'%')
+                    ->where('departments.name','=', $department)
+                    ->get();
+        }else if($name != ''){
+            $data = $student->where('students.name','LIKE', '%'.$name.'%')->get();
+        }
+
+            return response()->json(['data' => $b, 'name'=>$name, 'department'=>$department]);
+        
+
     }
 }
